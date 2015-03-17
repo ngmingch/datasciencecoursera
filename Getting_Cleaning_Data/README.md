@@ -1,6 +1,6 @@
 Assumptions:
-i) You have downloaded the data set and unzipped it. <br />
-ii) You are in the folder "UCI HAR Dataset". <br />
+i) You have downloaded the data set and unzipped it.
+ii) You are in the folder "UCI HAR Dataset".
 
 1) Download the run_analysis.R.
 2) Run the run_analysis.R
