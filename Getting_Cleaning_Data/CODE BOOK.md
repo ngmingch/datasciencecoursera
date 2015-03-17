@@ -1,5 +1,5 @@
-How the tidy dat sets are derived
-=================================
+How the tidy data sets are derived
+===================================
 1. The data in the subject_train.txt, X_train.txt and y_train.txt files are joined to form the training set. 
 
 2. The data in the subject_test.txt, X_test.txt and y_test.txt files are joined to form the test set.
