@@ -1,14 +1,13 @@
 plot1<-function() {
-  ##Read data
+  #Open and read data file
   pwr <- read.csv2("household_power_consumption.txt")
-  #Filter out the data between 1 Feb and 2 Feb 2007
-  pwr$Date<-as.Date(pwr$Date, format="%d/%m/%Y")
-  pwr<-pwr[pwr$Date > "2007-01-31" & pwr$Date < "2007-02-03",]
   
-  x<- as.double(as.character(pwr[,"Global_active_power"]))
+  #Extract the data between 1 Feb and 2 Feb 2007
+  pwr$datetime<-strptime(paste(pwr$Date, pwr$Time), format ="%d/%m/%Y %H:%M:%S")
+  pwr<-pwr[pwr$datetime > "2007-01-31 23:59:59" & pwr$datetime < "2007-02-03 00:00:00",]
   
-  #save plot PNG
+  #save the plot in PNG file
   png("plot1.png", width=480, height=480, units="px")
-  hist(x, xlab = "Global Active Power (kilowatts)", main="Global Active Power", col="red")
+  hist(as.double(as.character(pwr[,"Global_active_power"])), xlab = "Global Active Power (kilowatts)", main="Global Active Power", col="red")
   dev.off()
 }
