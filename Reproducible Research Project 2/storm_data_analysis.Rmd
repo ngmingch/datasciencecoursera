@@ -1,0 +1,107 @@
+Module 5 Project 2: Storm Data Analysis
+=======================================
+
+## Synopsis
+The report presents the results of an analysis on storm data collected by the U.S. National Oceanic and Atmospheric Administration.
+
+Usingthe data, the following types of events were determined: 
+* cause greatest harm to the population health, and 
+* have the greatest economic damages.
+
+The purpose of the report serve to warn the government and the muincipal managers ahead of a disaster so that preparatory work could be planned ahead to reduce potental damages to the community and the economy to the minimum.
+
+
+## Data Processing 
+
+### Step 1: Dataset source and loading
+
+The storm dataset source is 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'.
+
+```{r echo=TRUE, cache=TRUE}
+storm_dataset<-read.csv ("repdata_data_stormData.csv")
+
+names (storm_dataset)
+
+```
+
+### Step 2: Data analysis Part 1
+
+To determine the event type that cause greatest harm to the population health, I
+looked at the 'FATALITIES' and 'INJURIES' data fields. 
+
+First, I created a subset of data with 'EVTYPE', 'FATALITIES' and 'INJURIES' data fields. Then I summed up the fatalities and injuries for each event. Those events with no fatalities or injuries were dropped. Lastly, I aggregated the combined fatalities and injuries by the event type.
+
+```{r echo=TRUE}
+x<-storm_dataset[,c("EVTYPE", "FATALITIES", "INJURIES")]
+
+x[,"COMBINED"]<-x[,"FATALITIES"]+x[,"INJURIES"]
+
+x <- x[x$COMBINED>0,]
+
+library (dplyr)
+
+x<-group_by (x, EVTYPE)
+
+event_publichealth<-summarise(x, total=sum(COMBINED))
+
+summary (event_publichealth)
+```
+
+I looked at summary the dataset 'event_publichealth' and there were many events with low fatalities or injuries. The mean was 707.60 while the median was 5.00. I decided to drop those events with fatalities or injuries below the mean value.
+
+```{r echo=TRUE}
+event_publichealth<-event_publichealth[event_publichealth$total>mean(event_publichealth$total),]
+```
+
+```{r echo=TRUE}
+library (ggplot2)
+
+output_plot <- qplot (x=log10(total), y=EVTYPE, data=event_publichealth)
+
+output_plot + geom_line() + labs (y = "Event Type") + labs (x = "(No. of fatalities and/or injuries) - Log10 ") + labs (title = "Storm Event versus Fatality/Injury Count")
+
+```
+
+Clearly from the chart, TORNADO caused the most fatalities and injuries.
+
+### Step 3: Data analysis Part 2
+
+To determine the event type that cause greatest economic damages, I
+looked at the 'PROPDMG' and 'CROPDMG' data fields. 
+
+First, I created another subset of data with 'EVTYPE', 'PROPDMG' and 'CROPDMG' data fields. Then I summed up the damages for each event. Those events with no damages were dropped. Lastly, I aggregated the total damages by the event type.
+
+```{r echo=TRUE}
+y<-storm_dataset[,c("EVTYPE", "PROPDMG", "CROPDMG")]
+
+y[,"TOTAL"]<-y[,"PROPDMG"]+y[,"CROPDMG"]
+
+y <- y[y$TOTAL>0,]
+
+y<-group_by (y, EVTYPE)
+
+event_damage<-summarise(y, total=sum(TOTAL))
+
+summary (event_damage)
+```
+
+I looked at summary the dataset 'event_damage' and there were many events with low damages. The mean was 28,451 while the median was only 59. I decided to drop those events with damages below the mean value.
+
+```{r echo=TRUE}
+event_damage<-event_damage[event_damage$total>mean(event_damage$total),]
+```
+
+```{r echo=TRUE}
+output_plot <- qplot (x=log10(total), y=EVTYPE, data=event_damage)
+
+output_plot + geom_line() + labs (y = "Event Type") + labs (x = "(Damages in dollars) - Log10 ") + labs (title = "Storm Event versus Damages")
+
+```
+
+Clearly from the chart, TORNADO also caused the most economic damages.
+
+## Results
+
+From the analyses above, I concluded that TORNADO caused the most harm to public health as well as the most economic damages.
+
+
