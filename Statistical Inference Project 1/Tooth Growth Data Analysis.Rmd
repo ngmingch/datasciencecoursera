@@ -1,0 +1,61 @@
+---
+title: "Tooth Growth Data Analysis"
+author: "Ng Ming Chun"
+date: "Saturday, June 13, 2015"
+output: pdf_document
+---
+
+Tooth Growth Data Analysis
+======================================
+
+##1. Load the ToothGrowth data and perform some basic exploratory data analyses
+
+```{r, echo=TRUE}
+library(datasets)
+data (ToothGrowth) # load the data
+head (ToothGrowth) # show the first 10 rows of data
+str (ToothGrowth)
+```
+
+##2. Provide a basic summary of the data.
+```{r, echo=TRUE}
+summary (ToothGrowth) # print the summary of the data
+```
+
+It appears that the dataset contains the measurement of toothgrowth (i.e. length) with respect to 2 types of supplements of varing dosages. It is best to present the data in 2 panels for comparison of the 2 supplements. The y axis will represent the length, while the axis will respect the dosage of the respective supplement.
+
+```{r, echo=TRUE}
+library (ggplot2)
+
+dosage<-factor(ToothGrowth$dose)
+plot <- ggplot(data=ToothGrowth, aes(x=dosage, y=len, fill=dosage))
+
+plot + geom_boxplot(notch=F) + facet_grid(.~supp) + labs(title = "Supplement and Dosage Impact on Tooth Growth n", y="Length", x="Dosage") 
+```
+
+##3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+As there are different dosages, it is necessary to conduct 3 comparisons. I also assume non-pairwise comparisons.
+
+```{r, echo=TRUE}
+for (d in levels(factor(ToothGrowth$dose))) {
+  subset_d<- ToothGrowth[ToothGrowth$dose == d, ]
+  print (t.test(data=subset_d, len ~ supp, paired=FALSE, var.equal=FALSE))
+}
+```
+
+Based on the t-test, the following observations were made:
+* At 0.5 dosage, supplement OJ is better than supplement VC.
+* At 1.0 dosage, supplement OJ is better than supplement VC.
+* At 2.0 dosage, both supplements OJ and VC are almost equally effective.
+
+##4. State your conclusions and the assumptions needed for your conclusions.
+
+Conclusions:
+*Both supplements are effective on promoting tooth growth, and increasing dosage always leads to faster growth.
+*Below 2.0 dosage, supplement OJ is better than VC.
+
+Assumptions:
+*The sample data is not paired.
+*The sample variances for the supplements are not equal.
+

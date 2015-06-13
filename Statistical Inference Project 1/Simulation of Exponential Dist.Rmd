@@ -1,0 +1,96 @@
+---
+title: "Simulation of Exponential Dist"
+author: "Ng Ming Chun"
+date: "Saturday, June 13, 2015"
+output: pdf_document
+---
+
+Simulation of Exponential Distribution
+======================================
+
+In this simulation I am going to investigate the exponential distribution in R and compare it with the Central Limit Theorem. 
+
+A distribution of the mean of 40 exponentials with lambda of 0.2 will be used in this simulation.
+
+The 3 things I am going to show:
+1. Show the sample mean and compare it to the theoretical mean of the distribution.
+2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+3. Show that the distribution is approximately normal.
+
+## 1. Show the sample mean and compare it to the theoretical mean of the distribution.
+
+```{r, echo=TRUE}
+
+n<-40 # no of exponentials
+lambda<-0.2 #rate
+nosim<-1000 # no. of simulation
+
+set.seed (123) #set seed to make the simulation reproducible
+
+sim_data_matrix <- matrix(data=rexp(n*nosim, lambda) , nrow=nosim) # this will create nosim simulation of n exponentials of lambda rate
+
+```
+
+The sample mean is 
+```{r, echo=TRUE}
+simulation_means <- apply(sim_data_matrix, 1, mean) # compute the mean of each simulation
+
+sample_mean <- sum(simulation_means)/nosim # compute the overall sample mean for the nosim simulations
+
+print (sample_mean)
+```
+
+The theoretical mean of the exponential distribution is
+```{r, echo=TRUE}
+theoretical_mean <- 1/lambda
+
+print (theoretical_mean)
+```
+
+Conclusion: The sample mean is close to the theoretical mean.
+
+## 2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+
+We use the formula: variance = expected value (x^2) - (expected value (x))^2
+
+The sample variance is
+```{r, echo=TRUE}
+simulation_means_sq <- sapply(simulation_means, function (x) x^2) # compute the square of each simulated data
+
+simulation_means_sq_mean <- sum(simulation_means_sq)/(nosim)
+sample_variance <- simulation_means_sq_mean - (sample_mean)^2
+
+print (sample_variance)
+```
+
+The sample standard deviation is
+```{r, echo=TRUE}
+print (sqrt(sample_variance))
+```
+
+The theoretical variance of the exponential distribution is
+```{r, echo=TRUE}
+theoretical_variance <- (1/lambda)^2/n
+
+print (theoretical_variance)
+```
+
+The theoretical standard deviation is
+```{r, echo=TRUE}
+print (sqrt(theoretical_var))
+```
+
+Conclusion: The sample variance is close to the theoretical variance.
+
+## 3. Show that the distribution is approximately normal.
+
+I plot a histogram of the simulation means and overlay it with a normal distrbution.
+```{r, echo=TRUE}
+library(ggplot2)
+
+df<-data.frame(x=simulation_means)
+ggplot(data = df, aes(x = x)) + geom_histogram(aes(y = ..density..), fill = I("darkolivegreen3"), binwidth = 0.2, color = I("black")) + stat_function(fun = dnorm, arg = list(mean = theoretical_mean, sd = sqrt(theoretical_variance))) + labs(title = "Comparison of exponential means distribution with normal distribution", y="Density", x="Means")
+
+```
+
+Conclusion: The plot shows the sample distrbution approximate a normal distribution.
